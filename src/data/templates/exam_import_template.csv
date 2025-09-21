@@ -1,0 +1,6 @@
+Exam ID,Subject,Subject Code,Date,Time,Duration (minutes),Total Marks,Exam Type,Rooms,Invigilators,Instructions
+EXAM001,Mathematics,MATH101,2024-12-20,09:00,180,100,Final,"ROOM001,ROOM002","Prof. Smith,Dr. Johnson","No calculators allowed,Bring your own stationery,Mobile phones must be switched off"
+EXAM002,Physics,PHYS101,2024-12-22,14:00,150,80,Final,"ROOM003,ROOM004","Dr. Brown,Prof. Wilson","Scientific calculators allowed,Formula sheet provided,No electronic devices"
+EXAM003,English Literature,ENG201,2024-12-25,10:00,120,60,Midterm,ROOM005,Ms. Davis,"Essay format required,Bring blue/black pens only,No dictionaries allowed"
+EXAM004,Chemistry,CHEM101,2024-12-27,09:00,150,80,Final,"ROOM003,ROOM006","Dr. Lee,Prof. Taylor","Lab coats required,Periodic table provided,No mobile devices"
+EXAM005,Computer Science,CS101,2024-12-29,14:00,120,70,Quiz,ROOM004,Mr. Anderson,"Laptops provided,Internet access allowed,No external storage"

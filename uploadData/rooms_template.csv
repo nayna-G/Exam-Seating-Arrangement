@@ -1,0 +1,9 @@
+Room No,Room Name,Number of Seats,Seat Matrix (Rows x Columns)
+ROOM001,Main Hall A,25,12x5
+ROOM002,Main Hall B,45,9x5
+ROOM003,Science Lab 1,30,6x5
+ROOM004,Computer Lab,40,8x5
+ROOM005,Library Hall,30,6x5
+ROOM006,Small Hall A,25,5x5
+ROOM007,Small Hall B,25,5x5
+ROOM008,Auditorium,10,2x5
