@@ -1,3 +1,12 @@
+/home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/controller/ExamController.java
+/home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/model/Room.java
+/home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/model/Exam.java
 /home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/ExamSeatingApplication.java
+/home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/controller/RoomController.java
 /home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/model/Student.java
+/home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/controller/StudentController.java
+/home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/config/SecurityConfig.java
 /home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/service/SeatingAlgorithmService.java
+/home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/model/SeatingAssignment.java
+/home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/controller/SeatingController.java
+/home/user/Desktop/exam-seating/backend/src/main/java/com/examseating/model/SeatingArrangement.java

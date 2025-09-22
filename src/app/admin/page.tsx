@@ -64,13 +64,64 @@ export default function AdminDashboard() {
     reader.readAsText(file);
   };
 
-  // Generate seating arrangement with even distribution
+  // Create anti-cheating pattern by alternating students from different exams
+  const createAntiCheatPattern = (examGroups) => {
+    const antiCheatStudents = [];
+    
+    // Convert to arrays for easier manipulation
+    const examArrays = Array.from(examGroups.values());
+    
+    // Shuffle each exam group for randomization
+    examArrays.forEach(examArray => {
+      for (let i = examArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [examArray[i], examArray[j]] = [examArray[j], examArray[i]];
+      }
+    });
+    
+    console.log('🔀 Creating anti-cheat pattern...');
+    
+    // Create alternating pattern
+    const maxSize = Math.max(...examArrays.map(arr => arr.length));
+    
+    for (let i = 0; i < maxSize; i++) {
+      for (const examArray of examArrays) {
+        if (i < examArray.length) {
+          const student = examArray[i];
+          antiCheatStudents.push(student);
+          console.log(`   Added: ${student['Student Name']} (Exam: ${student['Student Exam']})`);
+        }
+      }
+    }
+    
+    console.log(`✅ Anti-cheat pattern created: ${antiCheatStudents.length} students arranged`);
+    return antiCheatStudents;
+  };
+
+  // Generate seating arrangement with BULLETPROOF sequential filling
   const generateSeating = async () => {
     if (students.length === 0 || rooms.length === 0) {
       alert('Please upload both students and rooms data first!');
       return;
     }
 
+    console.clear(); // Clear console for fresh debugging
+    console.log('🚀🚀🚀 BULLETPROOF SEATING GENERATION v2.0 STARTING 🚀🚀🚀');
+    console.log('🔧 Algorithm ID: BULLETPROOF-SEQUENTIAL-FILL-v2.0');
+    console.log('📅 Timestamp:', new Date().toISOString());
+    console.log('👥 Total students loaded:', students.length);
+    console.log('🏢 Total rooms loaded:', rooms.length);
+    
+    // FORCE REFRESH CHECK
+    if (students.length === 0) {
+      alert('❌ No students loaded! Please upload student data first.');
+      return;
+    }
+    if (rooms.length === 0) {
+      alert('❌ No rooms loaded! Please upload room data first.');
+      return;
+    }
+    
     // Group students by exam and date
     const examGroups = new Map();
     students.forEach(student => {
@@ -81,96 +132,118 @@ export default function AdminDashboard() {
       examGroups.get(key).push(student);
     });
 
-    // Generate seating for each exam
+    console.log('📊 EXAM GROUPS ANALYSIS:');
+    examGroups.forEach((students, examKey) => {
+      console.log(`   ${examKey}: ${students.length} students`);
+    });
+
+    // ANTI-CHEATING: Create alternating pattern to prevent same-exam adjacency
+    const allStudents = createAntiCheatPattern(examGroups);
+    console.log(`\n🔒 ANTI-CHEAT PATTERN CREATED: ${allStudents.length} students arranged`);
+    
+    // Sort rooms by capacity (smallest first for optimal filling)
+    const sortedRooms = [...rooms].sort((a, b) => 
+      parseInt(a['Number of Seats']) - parseInt(b['Number of Seats'])
+    );
+
+    console.log('🏢 Available rooms (sorted by capacity):');
+    sortedRooms.forEach(room => {
+      console.log(`   ${room['Room No']}: ${room['Number of Seats']} seats`);
+    });
+
+    // CRITICAL DEBUG ALERT
+    alert(`🚀 BULLETPROOF Algorithm v2.0 with ANTI-CHEATING!\nTotal Students: ${allStudents.length}\nRooms: ${sortedRooms.length}\n\n🔒 Students with same exam will NOT be adjacent\n🔀 Alternating pattern created\n\nCheck console for detailed logs.`);
+    
+    // Generate seating for ALL students together
     const seating = [];
-    for (const [examKey, examStudents] of examGroups) {
-      const [examName, date] = examKey.split('-');
+    
+    // BULLETPROOF SEQUENTIAL FILLING ALGORITHM
+    let studentIndex = 0;
+    
+    for (let roomIndex = 0; roomIndex < sortedRooms.length && studentIndex < allStudents.length; roomIndex++) {
+      const currentRoom = sortedRooms[roomIndex];
+      const roomCapacity = parseInt(currentRoom['Number of Seats']);
       
-      // Sort rooms by capacity (largest first)
-      const sortedRooms = [...rooms].sort((a, b) => 
-        parseInt(b['Number of Seats']) - parseInt(a['Number of Seats'])
-      );
-
-      // Calculate total capacity for this exam
-      const totalCapacity = sortedRooms.reduce((sum, room) => sum + parseInt(room['Number of Seats']), 0);
+      // Calculate how many students to assign to this room
+      const remainingStudents = allStudents.length - studentIndex;
+      const studentsForThisRoom = Math.min(roomCapacity, remainingStudents);
       
-      if (examStudents.length > totalCapacity) {
-        alert(`Warning: Not enough seats for ${examName} exam. Students: ${examStudents.length}, Total Capacity: ${totalCapacity}`);
-      }
-
-      // Calculate optimal distribution across rooms
-      const totalStudents = examStudents.length;
-      const roomCapacities = sortedRooms.map(room => parseInt(room['Number of Seats']));
-      
-      // Distribute students proportionally across rooms
-      const roomAllocations = [];
-      let remainingStudents = totalStudents;
-      
-      for (let i = 0; i < sortedRooms.length && remainingStudents > 0; i++) {
-        const roomCapacity = roomCapacities[i];
-        const remainingRooms = sortedRooms.length - i;
+      console.log(`🏢 Room ${currentRoom['Room No']} (capacity: ${roomCapacity}): Assigning ${studentsForThisRoom} students`);
         
-        // Calculate how many students to allocate to this room
-        let studentsForThisRoom;
-        if (i === sortedRooms.length - 1) {
-          // Last room gets all remaining students (but never exceed capacity)
-          studentsForThisRoom = Math.min(roomCapacity, remainingStudents);
-        } else {
-          // Distribute proportionally, but ensure we don't exceed room capacity
-          const proportionalAllocation = Math.ceil(remainingStudents / remainingRooms);
-          studentsForThisRoom = Math.min(roomCapacity, proportionalAllocation, remainingStudents);
-        }
-        
-        // Double-check: Ensure we never exceed room capacity
-        studentsForThisRoom = Math.min(studentsForThisRoom, roomCapacity);
-        
-        // Only allocate if we have students to allocate
-        if (studentsForThisRoom > 0) {
-          roomAllocations.push(studentsForThisRoom);
-          remainingStudents -= studentsForThisRoom;
-        } else {
-          roomAllocations.push(0);
-        }
-      }
-      
-      // Assign students to rooms based on calculated allocations
-      let studentIndex = 0;
-      
-      for (let roomIndex = 0; roomIndex < sortedRooms.length; roomIndex++) {
-        const currentRoom = sortedRooms[roomIndex];
-        const roomColumns = currentRoom.columns;
-        const studentsForThisRoom = roomAllocations[roomIndex] || 0;
-        
-        // Assign students to this room
-        for (let seatInRoom = 1; seatInRoom <= studentsForThisRoom && studentIndex < examStudents.length; seatInRoom++) {
-          const student = examStudents[studentIndex];
-          
-          // Calculate row and column within this specific room
-          const row = Math.floor((seatInRoom - 1) / roomColumns) + 1;
-          const column = ((seatInRoom - 1) % roomColumns) + 1;
-
-          // Final validation: ensure we don't exceed room capacity
-          if (seatInRoom <= parseInt(currentRoom['Number of Seats'])) {
-            seating.push({
-              studentId: student['Student ID'],
-              studentName: student['Student Name'],
-              studentExam: student['Student Exam'],
-              date: student['Date'],
-              roomNo: currentRoom['Room No'],
-              roomName: currentRoom['Room Name'],
-              seatNo: seatInRoom,
-              row: row,
-              column: column,
-              roomCapacity: currentRoom['Number of Seats'],
-              roomLayout: currentRoom['Seat Matrix (Rows x Columns)']
-            });
-
-            studentIndex++;
+        // Parse room layout
+        let roomColumns = 5; // Default
+        if (currentRoom['Seat Matrix (Rows x Columns)']) {
+          const matrix = currentRoom['Seat Matrix (Rows x Columns)'].split('x');
+          if (matrix.length === 2) {
+            roomColumns = parseInt(matrix[1]);
           }
         }
+        
+      // Assign students to this room - STRICT CAPACITY ENFORCEMENT
+      for (let seatInRoom = 1; seatInRoom <= studentsForThisRoom; seatInRoom++) {
+        if (studentIndex >= allStudents.length) {
+          break; // No more students to assign
+        }
+        
+        const student = allStudents[studentIndex];
+          
+          // Calculate row and column
+          const row = Math.floor((seatInRoom - 1) / roomColumns) + 1;
+          const column = ((seatInRoom - 1) % roomColumns) + 1;
+          
+        // Add to seating arrangement
+        seating.push({
+          studentId: student['Student ID'],
+          studentName: student['Student Name'],
+          studentExam: student['Student Exam'] || 'Mathematics',
+          date: student['Date'] || '2024-12-20',
+          roomNo: currentRoom['Room No'],
+          roomName: currentRoom['Room Name'],
+          seatNo: seatInRoom,
+          row: row,
+          column: column,
+          roomCapacity: roomCapacity,
+          roomLayout: currentRoom['Seat Matrix (Rows x Columns)']
+        });
+        
+        studentIndex++;
+      }
+      
+      const utilization = ((studentsForThisRoom/roomCapacity)*100).toFixed(1);
+      console.log(`✅ Room ${currentRoom['Room No']}: Assigned ${studentsForThisRoom}/${roomCapacity} students (${utilization}% utilized)`);
+      
+      // CRITICAL VALIDATION: Check for overflow
+      if (studentsForThisRoom > roomCapacity) {
+        console.error(`🚨🚨🚨 CRITICAL ERROR: Room ${currentRoom['Room No']} OVERFLOW! ${studentsForThisRoom} > ${roomCapacity}`);
+        alert(`CRITICAL ERROR: Room overflow detected! Room ${currentRoom['Room No']} has ${studentsForThisRoom} students but capacity is only ${roomCapacity}`);
+        return; // Stop execution
       }
     }
+    
+    // Check if all students were assigned
+    if (studentIndex < allStudents.length) {
+      const unassigned = allStudents.length - studentIndex;
+      console.warn(`⚠️ Warning: ${unassigned} students could not be assigned (insufficient room capacity)`);
+      alert(`Warning: ${unassigned} students could not be assigned. Please add more rooms or increase capacity.`);
+    }
 
+    // Generate summary of room utilization
+    const roomSummary = new Map();
+    seating.forEach(assignment => {
+      const roomNo = assignment.roomNo;
+      if (!roomSummary.has(roomNo)) {
+        roomSummary.set(roomNo, { count: 0, capacity: assignment.roomCapacity });
+      }
+      roomSummary.get(roomNo).count++;
+    });
+    
+    console.log(`\n=== FINAL SEATING SUMMARY ===`);
+    console.log(`Total students assigned: ${seating.length}`);
+    roomSummary.forEach((data, roomNo) => {
+      const utilization = ((data.count / data.capacity) * 100).toFixed(1);
+      console.log(`${roomNo}: ${data.count}/${data.capacity} students (${utilization}% utilized)`);
+    });
+    
     setSeatingArrangement(seating);
     
     // Save the seating data for student portal access

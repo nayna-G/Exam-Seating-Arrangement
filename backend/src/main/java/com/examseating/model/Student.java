@@ -34,6 +34,9 @@ public class Student {
     @NotBlank(message = "Section is required")
     private String section;
     
+    @NotBlank(message = "Exam subject is required")
+    private String examSubject;
+    
     @Email(message = "Invalid email format")
     private String email;
     
@@ -67,6 +70,17 @@ public class Student {
         this.rollNumber = rollNumber;
         this.className = className;
         this.section = section;
+        this.examSubject = "Mathematics"; // Default exam subject
+    }
+    
+    public Student(String studentId, String name, String rollNumber, String className, String section, String examSubject) {
+        this();
+        this.studentId = studentId;
+        this.name = name;
+        this.rollNumber = rollNumber;
+        this.className = className;
+        this.section = section;
+        this.examSubject = examSubject;
     }
     
     // Getters and Setters
@@ -116,6 +130,14 @@ public class Student {
     
     public void setSection(String section) {
         this.section = section;
+    }
+    
+    public String getExamSubject() {
+        return examSubject;
+    }
+    
+    public void setExamSubject(String examSubject) {
+        this.examSubject = examSubject;
     }
     
     public String getEmail() {

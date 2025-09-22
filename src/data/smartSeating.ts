@@ -175,11 +175,16 @@ export class SmartSeatingAlgorithm {
     for (const room of availableRooms) {
       if (studentIndex >= students.length) break;
       
-      const studentsForThisRoom = students.slice(studentIndex, studentIndex + room.numberOfSeats);
+      // Calculate how many students can actually fit in this room
+      const remainingStudents = students.length - studentIndex;
+      const studentsToAssign = Math.min(room.numberOfSeats, remainingStudents);
+      
+      const studentsForThisRoom = students.slice(studentIndex, studentIndex + studentsToAssign);
       const seating = this.assignStudentsToRoom(studentsForThisRoom, room, examName, examDate);
       roomSeatings.push(seating);
       
-      studentIndex += room.numberOfSeats;
+      // FIXED: Increment by actual number of students assigned, not room capacity
+      studentIndex += studentsToAssign;
     }
     
     return roomSeatings;

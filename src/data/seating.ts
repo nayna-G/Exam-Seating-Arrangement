@@ -128,8 +128,9 @@ export class SeatingManager {
     // Simple seating algorithm - can be enhanced with more sophisticated logic
     for (const roomId of roomIds) {
       const roomCapacity = roomCapacities[roomId] || 0;
-      const studentsForThisRoom = studentIds.slice(0, roomCapacity);
-      studentIds = studentIds.slice(roomCapacity);
+      const studentsToAssign = Math.min(roomCapacity, studentIds.length);
+      const studentsForThisRoom = studentIds.slice(0, studentsToAssign);
+      studentIds = studentIds.slice(studentsToAssign);
       
       // Calculate rows and columns (assuming 5 seats per row)
       const seatsPerRow = 5;

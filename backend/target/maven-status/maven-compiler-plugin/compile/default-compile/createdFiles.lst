@@ -1,0 +1,13 @@
+com/examseating/ExamSeatingApplication.class
+com/examseating/model/SeatingAssignment.class
+com/examseating/model/Room.class
+com/examseating/controller/StudentController.class
+com/examseating/model/Exam$ExamType.class
+com/examseating/model/Exam$ExamStatus.class
+com/examseating/controller/SeatingController.class
+com/examseating/model/Exam.class
+com/examseating/controller/ExamController.class
+com/examseating/controller/RoomController.class
+com/examseating/service/SeatingAlgorithmService.class
+com/examseating/model/Student.class
+com/examseating/model/SeatingArrangement.class

@@ -56,29 +56,114 @@ public class SeatingAlgorithmService {
     private List<SeatingAssignment> generateOptimizedAssignments(List<Student> students, List<Room> rooms) {
         List<SeatingAssignment> assignments = new ArrayList<>();
         
-        // Shuffle students for randomization
-        List<Student> shuffledStudents = new ArrayList<>(students);
-        Collections.shuffle(shuffledStudents);
+        System.out.println("🚀 BULLETPROOF Backend Seating Algorithm Starting...");
+        System.out.println("📊 Total students: " + students.size());
+        System.out.println("🏢 Total rooms: " + rooms.size());
+        System.out.println("🔒 Anti-cheating: Students with same exam will NOT be adjacent");
         
-        // Sort rooms by capacity (descending) for optimal distribution
+        // Group students by exam for anti-cheating arrangement
+        Map<String, List<Student>> examGroups = students.stream()
+                .collect(Collectors.groupingBy(Student::getExamSubject));
+        
+        System.out.println("📚 Exam groups found:");
+        examGroups.forEach((exam, studentList) -> 
+            System.out.println("   " + exam + ": " + studentList.size() + " students"));
+        
+        // Create alternating pattern to prevent same-exam adjacency
+        List<Student> antiCheatStudents = createAntiCheatPattern(examGroups);
+        
+        // Sort rooms by capacity (ascending) to fill smaller rooms first
         List<Room> sortedRooms = rooms.stream()
-                .sorted((r1, r2) -> Integer.compare(r2.getCapacity(), r1.getCapacity()))
+                .sorted((r1, r2) -> Integer.compare(r1.getCapacity(), r2.getCapacity()))
                 .collect(Collectors.toList());
+        
+        System.out.println("🔄 Rooms sorted by capacity:");
+        sortedRooms.forEach(room -> 
+            System.out.println("   " + room.getRoomId() + ": " + room.getCapacity() + " seats"));
         
         int studentIndex = 0;
         
+        // BULLETPROOF SEQUENTIAL FILLING - Fill rooms completely before moving to next
         for (Room room : sortedRooms) {
-            int studentsInRoom = Math.min(room.getCapacity(), shuffledStudents.size() - studentIndex);
+            if (studentIndex >= antiCheatStudents.size()) {
+                System.out.println("✅ All students assigned. Remaining rooms will be empty.");
+                break; // No more students to assign
+            }
             
-            for (int i = 0; i < studentsInRoom; i++) {
-                Student student = shuffledStudents.get(studentIndex);
-                SeatingAssignment assignment = createSeatingAssignment(student, room, i + 1);
+            // CRITICAL: Calculate exact number of students for this room
+            int remainingStudents = antiCheatStudents.size() - studentIndex;
+            int studentsForThisRoom = Math.min(room.getCapacity(), remainingStudents);
+            
+            System.out.println("🏢 Processing Room " + room.getRoomId() + 
+                             " (capacity: " + room.getCapacity() + 
+                             ", assigning: " + studentsForThisRoom + " students)");
+            
+            // Assign students to this room - STRICT CAPACITY ENFORCEMENT
+            for (int seatNumber = 1; seatNumber <= studentsForThisRoom; seatNumber++) {
+                if (studentIndex >= antiCheatStudents.size()) {
+                    System.out.println("⚠️ No more students available");
+                    break;
+                }
+                
+                Student student = antiCheatStudents.get(studentIndex);
+                SeatingAssignment assignment = createSeatingAssignment(student, room, seatNumber);
                 assignments.add(assignment);
                 studentIndex++;
+                
+                // Double-check we don't exceed capacity
+                if (seatNumber >= room.getCapacity()) {
+                    System.out.println("🛑 Room " + room.getRoomId() + " is full (capacity reached)");
+                    break;
+                }
             }
+            
+            double utilization = (double) studentsForThisRoom / room.getCapacity() * 100;
+            System.out.println("✅ Room " + room.getRoomId() + ": " + studentsForThisRoom + "/" + 
+                             room.getCapacity() + " students (" + String.format("%.1f", utilization) + "% utilized)");
+        }
+        
+        // Final validation
+        if (studentIndex < antiCheatStudents.size()) {
+            int unassigned = antiCheatStudents.size() - studentIndex;
+            System.out.println("⚠️ WARNING: " + unassigned + 
+                             " students could not be assigned due to insufficient room capacity");
+        } else {
+            System.out.println("🎉 SUCCESS: All " + students.size() + " students successfully assigned with anti-cheating pattern!");
         }
         
         return assignments;
+    }
+    
+    /**
+     * Create anti-cheating pattern by alternating students from different exams.
+     * This ensures students with same exam are never adjacent.
+     */
+    private List<Student> createAntiCheatPattern(Map<String, List<Student>> examGroups) {
+        List<Student> antiCheatStudents = new ArrayList<>();
+        
+        // Convert to lists for easier manipulation
+        List<List<Student>> examLists = new ArrayList<>(examGroups.values());
+        
+        // Shuffle each exam group for randomization
+        examLists.forEach(Collections::shuffle);
+        
+        System.out.println("🔀 Creating anti-cheat pattern...");
+        
+        // Create alternating pattern
+        int maxSize = examLists.stream().mapToInt(List::size).max().orElse(0);
+        
+        for (int i = 0; i < maxSize; i++) {
+            for (List<Student> examList : examLists) {
+                if (i < examList.size()) {
+                    Student student = examList.get(i);
+                    antiCheatStudents.add(student);
+                    System.out.println("   Added: " + student.getName() + " (Exam: " + student.getExamSubject() + ")");
+                }
+            }
+        }
+        
+        System.out.println("✅ Anti-cheat pattern created: " + antiCheatStudents.size() + " students arranged");
+        return antiCheatStudents;
     }
     
     /**

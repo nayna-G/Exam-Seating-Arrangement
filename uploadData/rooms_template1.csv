@@ -1,0 +1,5 @@
+Room No,Room Name,Number of Seats,Seat Matrix (Rows x Columns)
+ROOM101,UG Seminar Hall,40,8x5
+ROOM102,PG Seminar Hall,30,6x5
+ROOM103,CS108,25,5x5
+ROOM104,CS118,25,5x5
