@@ -6,6 +6,44 @@ import { saveSeatingData } from '../../data/seatingStorage';
 import { exportSeatingToCSV, downloadCSV, generateSeatingFilename, saveSeatingDataToStorage, parseCSVToSeating } from '../../utils/csvUtils';
 import { saveSeatingToServer, loadSeatingFromServer } from '../../services/serverStorage';
 
+// Type definitions
+interface Student {
+  'Student ID': string;
+  'Student Name': string;
+  'Student Exam': string;
+  'Date': string;
+}
+
+interface Room {
+  'Room No': string;
+  'Room Name': string;
+  'Number of Seats': string;
+  'Seat Matrix (Rows x Columns)': string;
+  rows?: number;
+  columns?: number;
+}
+
+interface SeatingAssignment {
+  studentId: string;
+  studentName: string;
+  studentExam: string;
+  date: string;
+  roomNo: string;
+  roomName: string;
+  seatNo: number;
+  row: number;
+  column: number;
+  roomCapacity: number;
+  roomLayout: string;
+}
+
+interface RoomInfo {
+  roomNo: string;
+  roomName: string;
+  roomCapacity: number;
+  roomLayout: string;
+}
+
 /**
  * Admin Dashboard Page
  * 
@@ -14,10 +52,10 @@ import { saveSeatingToServer, loadSeatingFromServer } from '../../services/serve
  */
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [students, setStudents] = useState<any[]>([]);
-  const [rooms, setRooms] = useState<any[]>([]);
-  const [seatingArrangement, setSeatingArrangement] = useState<any[] | null>(null);
-  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [seatingArrangement, setSeatingArrangement] = useState<SeatingAssignment[] | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<RoomInfo | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [isSavingToServer, setIsSavingToServer] = useState(false);
@@ -65,14 +103,14 @@ export default function AdminDashboard() {
   };
 
   // Create anti-cheating pattern by alternating students from different exams
-  const createAntiCheatPattern = (examGroups) => {
-    const antiCheatStudents = [];
+  const createAntiCheatPattern = (examGroups: Map<string, Student[]>): Student[] => {
+    const antiCheatStudents: Student[] = [];
     
     // Convert to arrays for easier manipulation
-    const examArrays = Array.from(examGroups.values());
+    const examArrays: Student[][] = Array.from(examGroups.values());
     
     // Shuffle each exam group for randomization
-    examArrays.forEach(examArray => {
+    examArrays.forEach((examArray: Student[]) => {
       for (let i = examArray.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [examArray[i], examArray[j]] = [examArray[j], examArray[i]];
@@ -82,7 +120,7 @@ export default function AdminDashboard() {
     console.log('🔀 Creating anti-cheat pattern...');
     
     // Create alternating pattern
-    const maxSize = Math.max(...examArrays.map(arr => arr.length));
+    const maxSize = Math.max(...examArrays.map((arr: Student[]) => arr.length));
     
     for (let i = 0; i < maxSize; i++) {
       for (const examArray of examArrays) {
@@ -123,18 +161,18 @@ export default function AdminDashboard() {
     }
     
     // Group students by exam and date
-    const examGroups = new Map();
+    const examGroups = new Map<string, Student[]>();
     students.forEach(student => {
       const key = `${student['Student Exam']}-${student['Date']}`;
       if (!examGroups.has(key)) {
         examGroups.set(key, []);
       }
-      examGroups.get(key).push(student);
+      examGroups.get(key)!.push(student);
     });
 
     console.log('📊 EXAM GROUPS ANALYSIS:');
-    examGroups.forEach((students, examKey) => {
-      console.log(`   ${examKey}: ${students.length} students`);
+    examGroups.forEach((studentsInGroup, examKey) => {
+      console.log(`   ${examKey}: ${studentsInGroup.length} students`);
     });
 
     // ANTI-CHEATING: Create alternating pattern to prevent same-exam adjacency
@@ -155,7 +193,7 @@ export default function AdminDashboard() {
     alert(`🚀 BULLETPROOF Algorithm v2.0 with ANTI-CHEATING!\nTotal Students: ${allStudents.length}\nRooms: ${sortedRooms.length}\n\n🔒 Students with same exam will NOT be adjacent\n🔀 Alternating pattern created\n\nCheck console for detailed logs.`);
     
     // Generate seating for ALL students together
-    const seating = [];
+    const seating: SeatingAssignment[] = [];
     
     // BULLETPROOF SEQUENTIAL FILLING ALGORITHM
     let studentIndex = 0;
@@ -228,13 +266,13 @@ export default function AdminDashboard() {
     }
 
     // Generate summary of room utilization
-    const roomSummary = new Map();
+    const roomSummary = new Map<string, { count: number; capacity: number }>();
     seating.forEach(assignment => {
       const roomNo = assignment.roomNo;
       if (!roomSummary.has(roomNo)) {
         roomSummary.set(roomNo, { count: 0, capacity: assignment.roomCapacity });
       }
-      roomSummary.get(roomNo).count++;
+      roomSummary.get(roomNo)!.count++;
     });
     
     console.log(`\n=== FINAL SEATING SUMMARY ===`);
@@ -497,7 +535,7 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(() => {
                   // Get unique rooms from seating arrangement
-                  const roomMap = new Map();
+                  const roomMap = new Map<string, RoomInfo>();
                   seatingArrangement.forEach(student => {
                     if (!roomMap.has(student.roomNo)) {
                       roomMap.set(student.roomNo, {
@@ -509,7 +547,7 @@ export default function AdminDashboard() {
                     }
                   });
                   
-                  return Array.from(roomMap.values()).map((room, index) => {
+                  return Array.from(roomMap.values()).map((room: RoomInfo, index) => {
                     const roomStudents = seatingArrangement.filter(s => s.roomNo === room.roomNo);
                     return (
                       <div
