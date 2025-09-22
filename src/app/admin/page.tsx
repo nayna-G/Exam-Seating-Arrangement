@@ -381,6 +381,8 @@ export default function AdminDashboard() {
         }
       } catch (error) {
         console.error('❌ Error loading from server:', error);
+        // Don't show alert for initial load failures - it's normal if no data exists yet
+        console.log('ℹ️ This is normal if no seating data has been generated yet');
       } finally {
         setIsLoadingFromServer(false);
       }

@@ -57,17 +57,24 @@ export const saveSeatingToServer = async (seatingData: SeatingAssignment[]): Pro
  */
 export const loadSeatingFromServer = async (retries: number = 3): Promise<SeatingData | null> => {
   for (let attempt = 1; attempt <= retries; attempt++) {
+    let timeoutId: NodeJS.Timeout | null = null;
     try {
       console.log(`Attempting to load seating data from server (attempt ${attempt}/${retries})...`);
+      
+      // Create AbortController for timeout (more compatible than AbortSignal.timeout)
+      const controller = new AbortController();
+      timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
       const response = await fetch(`${API_BASE_URL}/seating`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        // Add timeout to prevent hanging
-        signal: AbortSignal.timeout(10000) // 10 second timeout
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId); // Clear timeout if request succeeds
+      timeoutId = null;
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -77,10 +84,27 @@ export const loadSeatingFromServer = async (retries: number = 3): Promise<Seatin
       console.log('Seating data loaded from server:', data);
       return data;
     } catch (error) {
-      console.error(`Error loading seating from server (attempt ${attempt}/${retries}):`, error);
+      // Clear timeout in case of error
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      
+      // Better error logging with error type detection
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          console.error(`Request timeout (attempt ${attempt}/${retries}): Request took longer than 10 seconds`);
+        } else if (error.message.includes('fetch')) {
+          console.error(`Network error (attempt ${attempt}/${retries}):`, error.message);
+        } else {
+          console.error(`Server error (attempt ${attempt}/${retries}):`, error.message);
+        }
+      } else {
+        console.error(`Unknown error (attempt ${attempt}/${retries}):`, error);
+      }
       
       if (attempt === retries) {
-        console.error('All retry attempts failed. Server may be unavailable.');
+        console.error('All retry attempts failed. Server may be unavailable or network issues persist.');
         return null;
       }
       
