@@ -1,0 +1,23 @@
+? Starting Exam Seating System Backend...
+? Server will run on: http://localhost:8080
+? Data directory: ../src/data/
+? Server started successfully!
+? Access the API at: http://localhost:8080
+? Available endpoints:
+   GET  /api/students     - Get all students
+   GET  /api/rooms        - Get all rooms
+   GET  /api/exams        - Get all exams
+   POST /api/seating      - Generate seating arrangement
+
+Press Ctrl+C to stop the server
+=====================================
+? OPTIONS /api/seating
+? GET /api/seating
+? OPTIONS /api/seating
+? GET /api/seating
+? OPTIONS /api/seating
+? GET /api/seating
+? OPTIONS /api/seating
+? GET /api/seating
+? OPTIONS /api/student/STU001
+? GET /api/student/STU001

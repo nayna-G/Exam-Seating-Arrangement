@@ -1,0 +1,90 @@
+
+> exam-seating@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.3
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.4:3000
+
+ ✓ Starting...
+ ✓ Ready in 3.5s
+ ○ Compiling /admin ...
+ ✓ Compiled /admin in 7.6s (597 modules)
+ GET /admin 200 in 10651ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1044ms (356 modules)
+ GET /favicon.ico 200 in 1605ms
+ ✓ Compiled in 904ms (240 modules)
+ GET /admin 200 in 428ms
+ ✓ Compiled in 1423ms (579 modules)
+ GET /admin 200 in 370ms
+ ✓ Compiled in 375ms (240 modules)
+ GET /admin 200 in 129ms
+ ✓ Compiled in 390ms (240 modules)
+ ✓ Compiled in 311ms (240 modules)
+ GET /admin 200 in 305ms
+ GET /admin 200 in 57ms
+ ✓ Compiled in 203ms (240 modules)
+ GET /admin 200 in 58ms
+ ✓ Compiled in 183ms (240 modules)
+ GET /admin 200 in 72ms
+ ✓ Compiled in 207ms (240 modules)
+ GET /admin 200 in 55ms
+ GET /admin 200 in 308ms
+ ○ Compiling /student ...
+ ✓ Compiled /student in 1989ms (572 modules)
+ GET /student 200 in 3702ms
+ ✓ Compiled in 637ms (242 modules)
+ GET /admin 200 in 341ms
+ GET /student 200 in 358ms
+ ✓ Compiled in 841ms (586 modules)
+ GET /student 200 in 340ms
+ GET /admin 200 in 338ms
+ ✓ Compiled in 355ms (242 modules)
+ GET /student 200 in 141ms
+ GET /admin 200 in 143ms
+ ✓ Compiled in 382ms (242 modules)
+ GET /student 200 in 177ms
+ GET /admin 200 in 173ms
+ ✓ Compiled in 2.5s (586 modules)
+ GET /student 200 in 894ms
+ GET /admin 200 in 905ms
+ ✓ Compiled in 783ms (586 modules)
+ GET /admin 200 in 242ms
+ GET /student 200 in 243ms
+ ✓ Compiled in 745ms (586 modules)
+ GET /student 200 in 226ms
+ GET /admin 200 in 231ms
+ ✓ Compiled in 959ms (586 modules)
+ GET /student 200 in 220ms
+ GET /admin 200 in 222ms
+ ✓ Compiled in 986ms (586 modules)
+ GET /student 200 in 179ms
+ GET /admin 200 in 179ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1395ms (649 modules)
+ GET /student 200 in 662ms
+ GET /admin 200 in 662ms
+ GET / 200 in 2109ms
+ GET /admin 200 in 457ms
+ GET /student 200 in 203ms
+ GET /admin 200 in 202ms
+ GET /student 200 in 214ms
+ ✓ Compiled in 355ms (250 modules)
+ GET /student 200 in 169ms
+ GET /admin 200 in 170ms
+ GET /admin 200 in 197ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 914ms (416 modules)
+ GET /favicon.ico 200 in 1281ms
+ ✓ Compiled in 534ms (250 modules)
+ GET /student 200 in 473ms
+ GET /admin 200 in 476ms
+ GET /student 200 in 410ms
+ GET /student 200 in 248ms
+ ✓ Compiled in 631ms (250 modules)
+ GET /admin 200 in 253ms
+ GET /student 200 in 237ms
+ ✓ Compiled in 1039ms (649 modules)
+ GET /student 200 in 637ms
+ GET /admin 200 in 636ms

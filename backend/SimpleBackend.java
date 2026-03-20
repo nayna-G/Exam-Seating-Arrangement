@@ -185,17 +185,49 @@ public class SimpleBackend {
     }
     
     private static String searchStudent(String studentId) {
-        // Mock student search - in a real app, this would query the database
-        // For now, return the same mock data as generateSeating but filter by studentId
-        String mockData = "{\"studentId\":\"" + studentId + "\",\"studentName\":\"John Doe\",\"studentExam\":\"Mathematics\",\"date\":\"2024-12-20\",\"roomNo\":\"ROOM001\",\"roomName\":\"Main Hall A\",\"seatNo\":1,\"row\":1,\"column\":1,\"roomCapacity\":50,\"roomLayout\":\"10x5\"}";
-        
-        // Simple mock search - in real implementation, this would search the actual seating data
-        if (studentId.equals("STU001")) {
-            return "{\"found\":true,\"student\":" + mockData + "}";
-        } else if (studentId.equals("STU002")) {
-            return "{\"found\":true,\"student\":{\"studentId\":\"STU002\",\"studentName\":\"Jane Smith\",\"studentExam\":\"Mathematics\",\"date\":\"2024-12-20\",\"roomNo\":\"ROOM001\",\"roomName\":\"Main Hall A\",\"seatNo\":2,\"row\":1,\"column\":2,\"roomCapacity\":50,\"roomLayout\":\"10x5\"}}";
-        } else {
+        try {
+            Path filePath = Paths.get(DATA_DIR + SEATING_FILE);
+            if (!Files.exists(filePath)) {
+                return "{\"found\":false,\"message\":\"No seating data found\"}";
+            }
+            
+            String content = Files.readString(filePath);
+            String[] lines = content.split("\n");
+            
+            if (lines.length <= 1) {
+                return "{\"found\":false,\"message\":\"Empty seating file\"}";
+            }
+            
+            String[] headers = lines[0].split(",");
+            for (int i = 1; i < lines.length; i++) {
+                if (lines[i].trim().isEmpty()) continue;
+                
+                String[] values = lines[i].split(",");
+                // Use a proper CSV split that handles quotes if needed, but simple split for now matches loadSeatingFromFile
+                if (values.length >= headers.length) {
+                    String id = cleanValue(values[0]);
+                    if (id.equals(studentId)) {
+                        StringBuilder json = new StringBuilder();
+                        json.append("{\"found\":true,\"student\":{");
+                        json.append("\"studentId\":\"").append(id).append("\",");
+                        json.append("\"studentName\":\"").append(cleanValue(values[1])).append("\",");
+                        json.append("\"studentExam\":\"").append(cleanValue(values[2])).append("\",");
+                        json.append("\"date\":\"").append(cleanValue(values[3])).append("\",");
+                        json.append("\"roomNo\":\"").append(cleanValue(values[4])).append("\",");
+                        json.append("\"roomName\":\"").append(cleanValue(values[5])).append("\",");
+                        json.append("\"seatNo\":").append(parseInt(values[6])).append(",");
+                        json.append("\"row\":").append(parseInt(values[7])).append(",");
+                        json.append("\"column\":").append(parseInt(values[8])).append(",");
+                        json.append("\"roomCapacity\":").append(parseInt(values[9])).append(",");
+                        json.append("\"roomLayout\":\"").append(cleanValue(values[10])).append("\"");
+                        json.append("}}");
+                        return json.toString();
+                    }
+                }
+            }
             return "{\"found\":false,\"message\":\"Student not found\"}";
+        } catch (IOException e) {
+            return "{\"found\":false,\"message\":\"Failed to search student: " + e.getMessage() + "\"}";
         }
     }
     
