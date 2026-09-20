@@ -3,169 +3,148 @@
  * Handles export and import of seating arrangements
  */
 
-export interface SeatingAssignment {
-  studentId: string;
-  studentName: string;
-  studentExam: string;
-  date: string;
-  roomNo: string;
-  roomName: string;
-  seatNo: number;
-  row: number;
-  column: number;
-  roomCapacity: number;
-  roomLayout: string;
+export interface SeatingAssignment { // Interface declaration: Defines individual seat assignment
+  studentId: string; // Property: Student ID
+  studentName: string; // Property: Student name
+  studentExam: string; // Property: Exam subject
+  date: string; // Property: Exam date
+  roomNo: string; // Property: Room number
+  roomName: string; // Property: Room name
+  seatNo: number; // Property: Seat number
+  row: number; // Property: Row number
+  column: number; // Property: Column number
+  roomCapacity: number; // Property: Room capacity
+  roomLayout: string; // Property: Room layout string
 }
 
-export interface SeatingData {
-  seatingArrangement: SeatingAssignment[];
-  generatedAt: string;
-  totalStudents: number;
+export interface SeatingData { // Interface declaration: Defines complete seating data structure
+  seatingArrangement: SeatingAssignment[]; // Property: Array of seat assignments
+  generatedAt: string; // Property: Generation timestamp string
+  totalStudents: number; // Property: Total students count
 }
 
-/**
- * Convert seating data to CSV format
- */
-export const exportSeatingToCSV = (data: SeatingAssignment[]): string => {
-  const headers = [
-    'Student ID',
-    'Student Name', 
-    'Student Exam',
-    'Date',
-    'Room No',
-    'Room Name',
-    'Seat No',
-    'Row',
-    'Column',
-    'Room Capacity',
-    'Room Layout'
+export const exportSeatingToCSV = (data: SeatingAssignment[]): string => { // Function declaration: Converts seating data to CSV format
+  const headers = [ // Variable declaration: Array of CSV header strings
+    'Student ID', // Array element: Header 1
+    'Student Name', // Array element: Header 2
+    'Student Exam', // Array element: Header 3
+    'Date', // Array element: Header 4
+    'Room No', // Array element: Header 5
+    'Room Name', // Array element: Header 6
+    'Seat No', // Array element: Header 7
+    'Row', // Array element: Header 8
+    'Column', // Array element: Header 9
+    'Room Capacity', // Array element: Header 10
+    'Room Layout' // Array element: Header 11
   ];
 
-  const csvRows = [headers.join(',')];
+  const csvRows = [headers.join(',')]; // Variable declaration: Array with header row joined by commas
 
-  data.forEach(student => {
-    const row = [
-      `"${student.studentId}"`,
-      `"${student.studentName}"`,
-      `"${student.studentExam}"`,
-      `"${student.date}"`,
-      `"${student.roomNo}"`,
-      `"${student.roomName}"`,
-      student.seatNo.toString(),
-      student.row.toString(),
-      student.column.toString(),
-      student.roomCapacity.toString(),
-      `"${student.roomLayout}"`
+  data.forEach(student => { // Array method: Iterates through students to build CSV rows
+    const row = [ // Variable declaration: Array of student data values
+      `"${student.studentId}"`, // Array element: Quoted student ID
+      `"${student.studentName}"`, // Array element: Quoted student name
+      `"${student.studentExam}"`, // Array element: Quoted exam subject
+      `"${student.date}"`, // Array element: Quoted date
+      `"${student.roomNo}"`, // Array element: Quoted room number
+      `"${student.roomName}"`, // Array element: Quoted room name
+      student.seatNo.toString(), // Array element: Seat number as string
+      student.row.toString(), // Array element: Row number as string
+      student.column.toString(), // Array element: Column number as string
+      student.roomCapacity.toString(), // Array element: Room capacity as string
+      `"${student.roomLayout}"` // Array element: Quoted room layout
     ];
-    csvRows.push(row.join(','));
+    csvRows.push(row.join(',')); // Array method: Adds joined row to CSV rows array
   });
 
-  return csvRows.join('\n');
+  return csvRows.join('\n'); // Return statement: Returns complete CSV string with newline separators
 };
 
-/**
- * Download CSV file
- */
-export const downloadCSV = (csvContent: string, filename: string): void => {
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
+export const downloadCSV = (csvContent: string, filename: string): void => { // Function declaration: Triggers CSV file download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); // Object instantiation: Creates Blob with CSV content
+  const link = document.createElement('a'); // DOM method: Creates anchor element for download
   
-  if (link.download !== undefined) {
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', filename);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  if (link.download !== undefined) { // Conditional check: Verifies download attribute is supported
+    const url = URL.createObjectURL(blob); // URL method: Creates object URL for blob
+    link.setAttribute('href', url); // DOM method: Sets href attribute to blob URL
+    link.setAttribute('download', filename); // DOM method: Sets download attribute to filename
+    link.style.visibility = 'hidden'; // Property assignment: Hides link element
+    document.body.appendChild(link); // DOM method: Appends link to document body
+    link.click(); // DOM method: Triggers click to start download
+    document.body.removeChild(link); // DOM method: Removes link from document body
   }
 };
 
-/**
- * Parse CSV content to seating data
- */
-export const parseCSVToSeating = (csvContent: string): SeatingAssignment[] => {
-  const lines = csvContent.split('\n');
-  const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+export const parseCSVToSeating = (csvContent: string): SeatingAssignment[] => { // Function declaration: Parses CSV string to seating data
+  const lines = csvContent.split('\n'); // String method: Splits CSV into lines
+  const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim()); // String method: Parses header row, removes quotes and trims
   
-  const seatingData: SeatingAssignment[] = [];
+  const seatingData: SeatingAssignment[] = []; // Variable declaration: Array to store parsed assignments
   
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
+  for (let i = 1; i < lines.length; i++) { // For loop: Iterates through data rows (skipping header)
+    const line = lines[i].trim(); // String method: Trims whitespace from line
+    if (!line) continue; // Conditional check: Skips empty lines
     
-    const values = line.split(',').map(v => v.replace(/"/g, '').trim());
+    const values = line.split(',').map(v => v.replace(/"/g, '').trim()); // String method: Parses values, removes quotes and trims
     
-    if (values.length >= headers.length) {
-      const student: SeatingAssignment = {
-        studentId: values[0] || '',
-        studentName: values[1] || '',
-        studentExam: values[2] || '',
-        date: values[3] || '',
-        roomNo: values[4] || '',
-        roomName: values[5] || '',
-        seatNo: parseInt(values[6]) || 0,
-        row: parseInt(values[7]) || 0,
-        column: parseInt(values[8]) || 0,
-        roomCapacity: parseInt(values[9]) || 0,
-        roomLayout: values[10] || ''
+    if (values.length >= headers.length) { // Conditional check: Validates row has enough values
+      const student: SeatingAssignment = { // Variable declaration: Creates assignment object
+        studentId: values[0] || '', // Property: Student ID or empty string
+        studentName: values[1] || '', // Property: Student name or empty string
+        studentExam: values[2] || '', // Property: Exam subject or empty string
+        date: values[3] || '', // Property: Date or empty string
+        roomNo: values[4] || '', // Property: Room number or empty string
+        roomName: values[5] || '', // Property: Room name or empty string
+        seatNo: parseInt(values[6]) || 0, // Property: Seat number parsed or 0
+        row: parseInt(values[7]) || 0, // Property: Row number parsed or 0
+        column: parseInt(values[8]) || 0, // Property: Column number parsed or 0
+        roomCapacity: parseInt(values[9]) || 0, // Property: Room capacity parsed or 0
+        roomLayout: values[10] || '' // Property: Room layout or empty string
       };
       
-      seatingData.push(student);
+      seatingData.push(student); // Array method: Adds assignment to array
     }
   }
   
-  return seatingData;
+  return seatingData; // Return statement: Returns array of parsed assignments
 };
 
-/**
- * Save seating data to localStorage with timestamp
- */
-export const saveSeatingDataToStorage = (data: SeatingAssignment[]): void => {
-  const seatingData: SeatingData = {
-    seatingArrangement: data,
-    generatedAt: new Date().toISOString(),
-    totalStudents: data.length
+export const saveSeatingDataToStorage = (data: SeatingAssignment[]): void => { // Function declaration: Saves seating data to localStorage
+  const seatingData: SeatingData = { // Variable declaration: Creates seating data object
+    seatingArrangement: data, // Property: Assignments array
+    generatedAt: new Date().toISOString(), // Property: Current timestamp in ISO format
+    totalStudents: data.length // Property: Total students count
   };
   
-  try {
-    localStorage.setItem('examSeatingData', JSON.stringify(seatingData));
-    console.log('Seating data saved to localStorage');
-  } catch (error) {
-    console.error('Failed to save to localStorage:', error);
+  try { // Try block: Begins localStorage save operation
+    localStorage.setItem('examSeatingData', JSON.stringify(seatingData)); // Storage method: Saves data as JSON string
+    console.log('Seating data saved to localStorage'); // Console log: Success message
+  } catch (error) { // Catch block: Handles storage errors
+    console.error('Failed to save to localStorage:', error); // Console error: Logs error details
   }
 };
 
-/**
- * Load seating data from localStorage
- */
-export const loadSeatingDataFromStorage = (): SeatingData | null => {
-  try {
-    const saved = localStorage.getItem('examSeatingData');
-    if (saved) {
-      return JSON.parse(saved);
+export const loadSeatingDataFromStorage = (): SeatingData | null => { // Function declaration: Loads seating data from localStorage
+  try { // Try block: Begins localStorage load operation
+    const saved = localStorage.getItem('examSeatingData'); // Storage method: Retrieves saved data string
+    if (saved) { // Conditional check: If data exists
+      return JSON.parse(saved); // Return statement: Parses and returns JSON object
     }
-  } catch (error) {
-    console.error('Failed to load from localStorage:', error);
+  } catch (error) { // Catch block: Handles parse errors
+    console.error('Failed to load from localStorage:', error); // Console error: Logs error details
   }
   
-  return null;
+  return null; // Return statement: Returns null if no data or error
 };
 
-/**
- * Search for a student in seating data
- */
-export const searchStudentInSeating = (studentId: string, data: SeatingAssignment[]): SeatingAssignment | null => {
-  return data.find(student => 
+export const searchStudentInSeating = (studentId: string, data: SeatingAssignment[]): SeatingAssignment | null => { // Function declaration: Searches for student in seating data
+  return data.find(student => // Array method: Finds student matching ID (case-insensitive)
     student.studentId.toLowerCase() === studentId.toLowerCase()
-  ) || null;
+  ) || null; // Return statement: Returns student or null if not found
 };
 
-/**
- * Generate filename with timestamp
- */
-export const generateSeatingFilename = (): string => {
-  const now = new Date();
-  const timestamp = now.toISOString().split('T')[0]; // YYYY-MM-DD format
-  return `exam-seating-${timestamp}.csv`;
+export const generateSeatingFilename = (): string => { // Function declaration: Generates timestamped CSV filename
+  const now = new Date(); // Variable declaration: Gets current date
+  const timestamp = now.toISOString().split('T')[0]; // String method: Extracts date portion (YYYY-MM-DD)
+  return `exam-seating-${timestamp}.csv`; // Return statement: Returns formatted filename
 };
